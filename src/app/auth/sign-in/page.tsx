@@ -179,7 +179,7 @@ export default function SignInPage() {
                             />
                         </div>
                         <div className="text-center text-sm">
-                            Don't have an account?{" "}
+                            Dont have an account?
                             <Link
                                 href="/auth/sign-up"
                                 className="font-medium text-primary underline-offset-4 hover:underline"

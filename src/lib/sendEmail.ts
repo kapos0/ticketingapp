@@ -1,5 +1,4 @@
 "use server";
-import { boolean } from "better-auth";
 import nodemailer from "nodemailer";
 
 export async function sendEmail({

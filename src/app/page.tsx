@@ -12,7 +12,7 @@ export default function Home() {
                 Fast and simple support ticket management system.
             </p>
 
-            <div className="flex flex-col md:flex-row gap-4 justify-center animate-slide">
+            <div className="flex flex-col md:flex-row gap-4 justify-center animate-slide opacity-0">
                 <Link
                     href="/tickets/new"
                     className="px-6 py-3 rounded shadow transition"

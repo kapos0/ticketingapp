@@ -1,29 +1,28 @@
-import mongoose, { Schema, Document, Types } from "mongoose";
-import { IUser } from "./UserModel";
-
-export interface ITicket extends Document {
+export type TicketType = {
+    _id?: string;
     subject: string;
     description: string;
-    priority: string;
-    status: string;
+    priority: "Low" | "Medium" | "High";
+    status: "Open" | "In Progress" | "Resolved" | "Closed";
+    userId: string;
     createdAt: Date;
-    updatedAt: Date;
-    userId: Types.ObjectId;
-    user: IUser | Types.ObjectId;
-}
+};
 
-const TicketSchema: Schema = new Schema<ITicket>(
-    {
-        subject: { type: String, required: true },
-        description: { type: String, required: true },
-        priority: { type: String, required: true },
-        status: { type: String, default: "Open" },
-        userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    },
-    {
-        timestamps: true,
+export function validateTicket(ticket: TicketType): boolean {
+    const validPriorities = ["Low", "Medium", "High"];
+    const validStatuses = ["Open", "In Progress", "Resolved", "Closed"];
+
+    if (!ticket.subject || !ticket.description || !ticket.userId) {
+        return false; // Zorunlu alanlar eksik
     }
-);
 
-export default mongoose.models?.Ticket ||
-    mongoose.model<ITicket>("Ticket", TicketSchema);
+    if (!validPriorities.includes(ticket.priority)) {
+        return false; // Priority hatalı
+    }
+
+    if (!validStatuses.includes(ticket.status)) {
+        return false; // Status hatalı
+    }
+
+    return true; // Veri geçerli
+}
