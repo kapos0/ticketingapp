@@ -11,7 +11,7 @@ export default async function NewTicketPage() {
     if (!session?.user) redirect("/auth/sign-in");
     return (
         <div className="min-h-screen bg-blue-50 dark:bg-black flex items-center justify-center px-4">
-            <NewTicketForm />
+            <NewTicketForm user={session.user.name} />
         </div>
     );
 }

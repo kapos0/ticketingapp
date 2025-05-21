@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { createTicket } from "@/actions/TicketAction";
 
-export default function NewTicketForm() {
+export default function NewTicketForm({ user }: { user: string }) {
     const [state, formAction] = useActionState(createTicket, {
         success: false,
         message: "",
@@ -30,6 +30,12 @@ export default function NewTicketForm() {
                 </p>
             )}
             <form action={formAction} className="space-y-4">
+                <input
+                    hidden
+                    type="text"
+                    name="createdBy"
+                    defaultValue={user}
+                />
                 <input
                     className="w-full border border-gray-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
                     type="text"

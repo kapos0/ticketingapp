@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { nextCookies } from "better-auth/next-js";
+import { admin } from "better-auth/plugins";
 import { clientDB } from "./dbClient";
 import { sendEmail } from "./sendEmail";
 
@@ -47,5 +48,5 @@ export const auth = betterAuth({
             clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
         },
     },
-    plugins: [nextCookies()],
+    plugins: [nextCookies(), admin()],
 });

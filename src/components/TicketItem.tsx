@@ -8,7 +8,6 @@ type TicketItemProps = {
 
 export default function TicketItem({ ticket }: TicketItemProps) {
     const isClosed = ticket.status === "Closed";
-
     return (
         <div
             key={ticket._id}
@@ -17,6 +16,9 @@ export default function TicketItem({ ticket }: TicketItemProps) {
             }`}
         >
             <div>
+                <h1 className="text-sm text-gray-500 dark:text-gray-200 transition-colors duration-300">
+                    Created by: {ticket.user}
+                </h1>
                 <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-300 transition-colors duration-300">
                     {ticket.subject}
                 </h2>

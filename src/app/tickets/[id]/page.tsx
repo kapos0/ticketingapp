@@ -15,6 +15,7 @@ export default async function TicketDetailsPage(props: {
     const ticket: TicketType = {
         _id: ticketData._id?.toString() ?? "",
         subject: ticketData.subject,
+        user: ticketData.user,
         description: ticketData.description,
         priority: ticketData.priority,
         createdAt: ticketData.createdAt,
@@ -30,6 +31,10 @@ export default async function TicketDetailsPage(props: {
                 <h1 className="text-3xl font-bold text-blue-600 dark:text-blue-300">
                     {ticket.subject}
                 </h1>
+
+                <h2 className="text-sm text-gray-500 dark:text-gray-200">
+                    Created by: {ticket.user}
+                </h2>
 
                 <div className="text-gray-700 dark:text-gray-200">
                     <h2 className="text-lg font-semibold mb-2">Description</h2>

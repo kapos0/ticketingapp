@@ -29,12 +29,14 @@ export async function createTicket(
         const subject = formData.get("subject")?.toString().trim();
         const description = formData.get("description")?.toString().trim();
         const priority = formData.get("priority")?.toString();
-        if (!subject || !description || !priority)
+        const createdBy = formData.get("createdBy")?.toString().trim();
+        if (!subject || !description || !priority || !createdBy)
             return { success: false, message: "All fields are required!" };
 
         const userId = await getUserId();
 
         const ticket: TicketType = {
+            user: createdBy,
             subject,
             description,
             priority: priority as "Low" | "Medium" | "High",
@@ -45,6 +47,7 @@ export async function createTicket(
         if (validateTicket(ticket)) {
             (await getCollection()).insertOne({
                 subject,
+                user: createdBy,
                 description,
                 priority,
                 status: "Open",
@@ -76,11 +79,16 @@ export async function getTicketById(id: string) {
     }
 }
 
-export async function getTickets() {
+export async function getTickets(isAdmin: boolean) {
     try {
-        const userId = await getUserId();
-        const tickets = (await getCollection()).find({ userId }).toArray();
-        return tickets;
+        if (!isAdmin) {
+            const userId = await getUserId();
+            const tickets = (await getCollection()).find({ userId }).toArray();
+            return tickets;
+        } else {
+            const tickets = (await getCollection()).find({}).toArray();
+            return tickets;
+        }
     } catch (error) {
         console.error("Error fetching tickets:", error);
         throw new Error("Failed to fetch tickets");

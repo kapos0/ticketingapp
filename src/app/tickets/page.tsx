@@ -9,13 +9,13 @@ export default async function TicketsPage() {
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) redirect("/auth/sign-in");
 
-    const rawTickets = await getTickets();
+    const rawTickets = await getTickets(false);
     const tickets = rawTickets as unknown as TicketType[];
 
     return (
         <div className="min-h-screen bg-blue-50 dark:bg-neutral-900 p-8 transition-colors duration-300">
             <h1 className="text-3xl font-bold text-blue-600 dark:text-blue-300 mb-8 text-center transition-colors duration-300">
-                Support Tickets
+                Support Tickets Whic You Created
             </h1>
             {tickets.length === 0 ? (
                 <p className="text-center text-gray-600 dark:text-gray-200 transition-colors duration-300">
