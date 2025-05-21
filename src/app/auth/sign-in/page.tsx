@@ -54,7 +54,7 @@ export default function SignInPage() {
                 },
                 onSuccess: () => {
                     form.reset();
-                    router.push("/dashboard");
+                    router.push("/");
                 },
                 onError: (ctx) => {
                     console.log("error", ctx);
@@ -170,12 +170,12 @@ export default function SignInPage() {
                             <GoogleAuthButton
                                 action="sign-in"
                                 buttonText="Sign In with Google"
-                                redirectTo="/dashboard"
+                                redirectTo="/"
                             />
                             <GithubAuthButton
                                 action="sign-in"
                                 buttonText="Sign In with Github"
-                                redirectTo="/dashboard"
+                                redirectTo="/"
                             />
                         </div>
                         <div className="text-center text-sm">

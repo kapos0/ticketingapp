@@ -187,12 +187,12 @@ export default function SignUpPage() {
                             <GoogleAuthButton
                                 action="sign-up"
                                 buttonText="Sign Up with Google"
-                                redirectTo="/dashboard"
+                                redirectTo="/"
                             />
                             <GithubAuthButton
                                 action="sign-up"
                                 buttonText="Sign Up with Github"
-                                redirectTo="/dashboard"
+                                redirectTo="/"
                             />
                         </div>
 

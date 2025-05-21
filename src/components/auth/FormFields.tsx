@@ -10,18 +10,19 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Control, FieldPath, FieldValues } from "react-hook-form";
 
-type InputFieldProps = {
-    control: any;
-    name: string;
+interface InputFieldProps<T extends FieldValues> {
+    control: Control<T>;
+    name: FieldPath<T>;
     label: string;
     placeholder: string;
     type: "email" | "password" | "text";
     icon?: React.ReactNode;
     showPasswordToggle?: boolean;
-};
+}
 
-export function InputField({
+export function InputField<T extends FieldValues>({
     control,
     name,
     label,
@@ -29,7 +30,7 @@ export function InputField({
     type,
     icon = <Mail className="h-5 w-5 text-muted-foreground" />,
     showPasswordToggle = false,
-}: InputFieldProps) {
+}: InputFieldProps<T>) {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
@@ -80,13 +81,17 @@ export function InputField({
     );
 }
 
-type CheckboxFieldProps = {
-    control: any;
-    name: string;
+interface CheckboxFieldProps<T extends FieldValues> {
+    control: Control<T>;
+    name: FieldPath<T>;
     label: string;
-};
+}
 
-export function CheckboxField({ control, name, label }: CheckboxFieldProps) {
+export function CheckboxField<T extends FieldValues>({
+    control,
+    name,
+    label,
+}: CheckboxFieldProps<T>) {
     return (
         <FormField
             control={control}

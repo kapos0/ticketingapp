@@ -18,12 +18,19 @@ export default async function Navbar() {
             <div className="flex items-center space-x-4">
                 {session?.user ? (
                     <>
-                        {session.user.role === "admin" && (
+                        {session.user.role === "manager" ? (
                             <Link
-                                href="/dashboard"
+                                href="/dashboard/manager"
                                 className="hover:underline transition"
                             >
-                                Admin Dashboard
+                                Manager Dashboard
+                            </Link>
+                        ) : (
+                            <Link
+                                href="/dashboard/technician"
+                                className="hover:underline transition"
+                            >
+                                Technician Dashboard
                             </Link>
                         )}
                         <Link

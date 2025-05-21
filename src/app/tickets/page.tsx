@@ -1,9 +1,9 @@
-import { getTickets } from "@/actions/TicketAction";
-import TicketItem from "@/components/TicketItem";
-import { auth } from "@/lib/auth";
-import { TicketType } from "@/models/TicketModel";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { TicketType } from "@/models/TicketModel";
+import { getTickets } from "@/actions/TicketActions";
+import TicketItem from "@/components/TicketItem";
 
 export default async function TicketsPage() {
     const session = await auth.api.getSession({ headers: await headers() });

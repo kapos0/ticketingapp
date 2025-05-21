@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { clientDB } from "@/lib/dbClient";
 import { TicketType, validateTicket } from "@/models/TicketModel";
 import { ObjectId } from "mongodb";
+import { notifyManager } from "./UserActions";
 
 async function getCollection() {
     const db = await clientDB();
@@ -55,6 +56,7 @@ export async function createTicket(
                 userId,
             });
             revalidatePath("/tickets");
+            await notifyManager(description);
             return { success: true, message: "Ticket Created Succesfully!" };
         } else return { success: false, message: "Invalid ticket data!" };
     } catch (error) {
@@ -79,16 +81,21 @@ export async function getTicketById(id: string) {
     }
 }
 
-export async function getTickets(isAdmin: boolean) {
+export async function getTickets(isTechnician: boolean) {
+    let tickets;
     try {
-        if (!isAdmin) {
+        if (!isTechnician) {
             const userId = await getUserId();
-            const tickets = (await getCollection()).find({ userId }).toArray();
-            return tickets;
-        } else {
-            const tickets = (await getCollection()).find({}).toArray();
-            return tickets;
-        }
+            tickets = (await getCollection())
+                .find({ userId })
+                .sort({ createdAt: -1 })
+                .toArray();
+        } else
+            tickets = (await getCollection())
+                .find({})
+                .sort({ createdAt: -1 })
+                .toArray();
+        return tickets as unknown as TicketType[];
     } catch (error) {
         console.error("Error fetching tickets:", error);
         throw new Error("Failed to fetch tickets");

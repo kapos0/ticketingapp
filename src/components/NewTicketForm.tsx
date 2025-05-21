@@ -2,7 +2,7 @@
 import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { createTicket } from "@/actions/TicketAction";
+import { createTicket } from "@/actions/TicketActions";
 
 export default function NewTicketForm({ user }: { user: string }) {
     const [state, formAction] = useActionState(createTicket, {
@@ -56,6 +56,15 @@ export default function NewTicketForm({ user }: { user: string }) {
                     <option value="Low">Low Priority</option>
                     <option value="Medium">Medium Priority</option>
                     <option value="High">High Priority</option>
+                </select>
+                <select
+                    className="w-full border border-gray-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+                    name="department"
+                    defaultValue="Genaral"
+                >
+                    <option value="Genaral">Genaral</option>
+                    <option value="HR">HR</option>
+                    <option value="IT">IT</option>
                 </select>
                 <button
                     className="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700 transition disabled:opacity-50 dark:bg-blue-500 dark:hover:bg-blue-600"

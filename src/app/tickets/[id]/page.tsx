@@ -1,9 +1,9 @@
 import Link from "next/link";
+import { TicketType } from "@/models/TicketModel";
 import { notFound } from "next/navigation";
-import { getTicketById } from "@/actions/TicketAction";
+import { getTicketById } from "@/actions/TicketActions";
 import { getPriorityClass } from "@/lib/utils";
 import CloseTicketButton from "@/components/CloseTicketButton";
-import { TicketType } from "@/models/TicketModel";
 
 export default async function TicketDetailsPage(props: {
     params: Promise<{ id: string }>;

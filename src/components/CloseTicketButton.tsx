@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect } from "react";
-import { closeTicket } from "@/actions/TicketAction";
+import { closeTicket } from "@/actions/TicketActions";
 import { toast } from "react-toastify";
 
 export default function CloseTicketButton({

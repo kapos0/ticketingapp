@@ -15,7 +15,7 @@ type GithubAuthButtonProps = {
 
 export function GithubAuthButton({
     action = "sign-in",
-    redirectTo = "/dashboard",
+    redirectTo = "/",
     buttonText = "Continue with Github",
 }: GithubAuthButtonProps) {
     const [isLoading, setIsLoading] = useState(false);

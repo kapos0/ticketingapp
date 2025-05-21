@@ -15,7 +15,7 @@ type GoogleAuthButtonProps = {
 
 export function GoogleAuthButton({
     action = "sign-in",
-    redirectTo = "/dashboard",
+    redirectTo = "/",
     buttonText = "Continue with Google",
 }: GoogleAuthButtonProps) {
     const [isLoading, setIsLoading] = useState(false);
