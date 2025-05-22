@@ -19,6 +19,10 @@ export default function TicketItem({ ticket }: TicketItemProps) {
                 <h1 className="text-sm text-gray-500 dark:text-gray-200 transition-colors duration-300">
                     Created by: {ticket.user}
                 </h1>
+                <h3 className="text-sm mt-2 text-gray-500 dark:text-gray-200 transition-colors duration-300">
+                    Assigned To:
+                    {ticket.assignedTo !== "" ? ticket.assignedTo : "no one"}
+                </h3>
                 <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-300 transition-colors duration-300">
                     {ticket.subject}
                 </h2>

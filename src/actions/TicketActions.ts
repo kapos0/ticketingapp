@@ -5,7 +5,6 @@ import { auth } from "@/lib/auth";
 import { clientDB } from "@/lib/dbClient";
 import { TicketType, validateTicket } from "@/models/TicketModel";
 import { ObjectId } from "mongodb";
-import { notifyManager } from "./UserActions";
 
 async function getCollection() {
     const db = await clientDB();
@@ -31,7 +30,8 @@ export async function createTicket(
         const description = formData.get("description")?.toString().trim();
         const priority = formData.get("priority")?.toString();
         const createdBy = formData.get("createdBy")?.toString().trim();
-        if (!subject || !description || !priority || !createdBy)
+        const department = formData.get("department")?.toString().trim();
+        if (!subject || !description || !priority || !createdBy || !department)
             return { success: false, message: "All fields are required!" };
 
         const userId = await getUserId();
@@ -40,8 +40,10 @@ export async function createTicket(
             user: createdBy,
             subject,
             description,
+            department,
             priority: priority as "Low" | "Medium" | "High",
             status: "Open",
+            assignedTo: "",
             createdAt: new Date(),
             userId,
         };
@@ -50,13 +52,14 @@ export async function createTicket(
                 subject,
                 user: createdBy,
                 description,
+                department,
+                assignedTo: "",
                 priority,
                 status: "Open",
                 createdAt: new Date(),
                 userId,
             });
             revalidatePath("/tickets");
-            await notifyManager(description);
             return { success: true, message: "Ticket Created Succesfully!" };
         } else return { success: false, message: "Invalid ticket data!" };
     } catch (error) {
@@ -81,10 +84,10 @@ export async function getTicketById(id: string) {
     }
 }
 
-export async function getTickets(isTechnician: boolean) {
+export async function getTickets(isAttendant: boolean) {
     let tickets;
     try {
-        if (!isTechnician) {
+        if (!isAttendant) {
             const userId = await getUserId();
             tickets = (await getCollection())
                 .find({ userId })
@@ -99,6 +102,46 @@ export async function getTickets(isTechnician: boolean) {
     } catch (error) {
         console.error("Error fetching tickets:", error);
         throw new Error("Failed to fetch tickets");
+    }
+}
+
+export async function getAssignedTickets(technicianId: string) {
+    let tickets;
+    try {
+        tickets = (await getCollection())
+            .find({ assignedTo: technicianId })
+            .sort({ createdAt: -1 })
+            .toArray();
+        return tickets as unknown as TicketType[];
+    } catch (error) {
+        console.error("Error fetching assigned tickets:", error);
+        throw new Error("Failed to fetch assigned tickets");
+    }
+}
+
+export async function assignTicket(ticketId: string, technicianId: string) {
+    try {
+        if (!ticketId || !technicianId)
+            return {
+                success: false,
+                message: "Ticket ID and Technician ID are required!",
+            };
+        const objectId = new ObjectId(ticketId);
+        const ticket = (await getCollection()).findOne({ _id: objectId });
+        if (!ticket) return { success: false, message: "Ticket not found!" };
+
+        (await getCollection()).updateOne(
+            { _id: objectId },
+            { $set: { assignedTo: technicianId } }
+        );
+        revalidatePath("/tickets");
+        return { success: true, message: "Ticket Assigned Successfully!" };
+    } catch (error) {
+        console.error("Error assigning ticket:", error);
+        return {
+            success: false,
+            message: "An error occurred while assigning the ticket.",
+        };
     }
 }
 

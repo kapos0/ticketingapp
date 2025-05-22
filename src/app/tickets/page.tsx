@@ -15,7 +15,7 @@ export default async function TicketsPage() {
     return (
         <div className="min-h-screen bg-blue-50 dark:bg-neutral-900 p-8 transition-colors duration-300">
             <h1 className="text-3xl font-bold text-blue-600 dark:text-blue-300 mb-8 text-center transition-colors duration-300">
-                Support Tickets Whic You Created
+                Support Tickets Which You Created
             </h1>
             {tickets.length === 0 ? (
                 <p className="text-center text-gray-600 dark:text-gray-200 transition-colors duration-300">

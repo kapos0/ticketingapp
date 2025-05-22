@@ -1,12 +1,26 @@
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { nextCookies } from "better-auth/next-js";
-import { admin } from "better-auth/plugins";
 import { clientDB } from "./dbClient";
 import { sendEmail } from "./sendEmail";
 
 export const auth = betterAuth({
     database: mongodbAdapter(await clientDB()),
+    user: {
+        additionalFields: {
+            role: {
+                type: "string",
+                default: "user",
+                required: true,
+                description: "User role",
+                options: [
+                    { value: "user", label: "User" },
+                    { value: "technician", label: "Technician" },
+                    { value: "manager", label: "Manager" },
+                ],
+            },
+        },
+    },
     emailAndPassword: {
         enabled: true,
         requireEmailVerification: true,
@@ -48,5 +62,5 @@ export const auth = betterAuth({
             clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
         },
     },
-    plugins: [nextCookies(), admin()],
+    plugins: [nextCookies()],
 });

@@ -19,7 +19,7 @@ export default function EmailVerifiedPage() {
                     now access all features.
                 </p>
 
-                <Link href="/dashboard" className="w-full block">
+                <Link href="/dashboard/manager" className="w-full block">
                     <Button className="w-full" size="lg">
                         Go to Dashboard
                     </Button>

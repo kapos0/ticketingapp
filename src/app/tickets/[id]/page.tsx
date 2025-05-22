@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { getTicketById } from "@/actions/TicketActions";
 import { getPriorityClass } from "@/lib/utils";
 import CloseTicketButton from "@/components/CloseTicketButton";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export default async function TicketDetailsPage(props: {
     params: Promise<{ id: string }>;
@@ -11,12 +13,15 @@ export default async function TicketDetailsPage(props: {
     const { id } = await props.params;
     const ticketData = await getTicketById(id);
     if (!ticketData) notFound();
+    const session = await auth.api.getSession({ headers: await headers() });
 
     const ticket: TicketType = {
         _id: ticketData._id?.toString() ?? "",
         subject: ticketData.subject,
         user: ticketData.user,
         description: ticketData.description,
+        department: ticketData.department,
+        assignedTo: ticketData.assignedTo,
         priority: ticketData.priority,
         createdAt: ticketData.createdAt,
         status: ticketData.status,
@@ -42,6 +47,15 @@ export default async function TicketDetailsPage(props: {
                 </div>
 
                 <div className="text-gray-700 dark:text-gray-200">
+                    <p className="mb-2">Assigned To</p>
+                    <p>
+                        {ticket.assignedTo !== ""
+                            ? ticket.assignedTo
+                            : "no one"}
+                    </p>
+                </div>
+
+                <div className="text-gray-700 dark:text-gray-200">
                     <h2 className="text-lg font-semibold mb-2">Priority</h2>
                     <p className={getPriorityClass(ticket.priority)}>
                         {ticket.priority}
@@ -60,12 +74,14 @@ export default async function TicketDetailsPage(props: {
                     ← Back to Tickets
                 </Link>
 
-                {ticket.status !== "Closed" && (
+                {ticket.status !== "Closed" &&
+                ticket.userId === session?.user.id &&
+                session.user.role !== "manager" ? (
                     <CloseTicketButton
                         ticketId={ticket._id!}
                         isClosed={isClosed}
                     />
-                )}
+                ) : null}
             </div>
         </div>
     );

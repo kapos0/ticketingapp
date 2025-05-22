@@ -5,6 +5,8 @@ export type TicketType = {
     priority: "Low" | "Medium" | "High";
     status: "Open" | "In Progress" | "Resolved" | "Closed";
     userId: string;
+    assignedTo?: string;
+    department: string;
     user: string;
     createdAt: Date;
 };
@@ -17,7 +19,8 @@ export function validateTicket(ticket: TicketType): boolean {
         !ticket.subject ||
         !ticket.description ||
         !ticket.userId ||
-        !ticket.user
+        !ticket.user ||
+        !ticket.department
     ) {
         return false; // Zorunlu alanlar eksik
     }
