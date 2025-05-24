@@ -2,34 +2,27 @@
 import React, { useState } from "react";
 import { TicketType } from "@/models/TicketModel";
 import TicketItem from "@/components/TicketItem";
+import { User } from "better-auth";
 
-type UserType = {
-    id: string;
-    name: string;
-    email: string;
-    role: "user" | "manager" | "technician";
+type exceededUserType = User & {
+    role: "user" | "technician" | "manager";
 };
-
-const mockUsers: UserType[] = [
-    { id: "1", name: "Ali Veli", email: "ali@example.com", role: "user" },
-    { id: "2", name: "Ayşe Fatma", email: "ayse@example.com", role: "manager" },
-    {
-        id: "3",
-        name: "Mehmet Can",
-        email: "mehmet@example.com",
-        role: "technician",
-    },
-];
-
-const roles = ["user", "manager", "admin"] as const;
 
 export default function ManagerDashboardUI({
     tickets,
+    users,
+    technicians,
 }: {
     tickets: TicketType[];
+    users: exceededUserType[];
+    technicians: exceededUserType[];
 }) {
-    const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
-    const [newRole, setNewRole] = useState<UserType["role"]>("user");
+    const roles: exceededUserType["role"][] = ["user", "technician", "manager"];
+
+    const [selectedUser, setSelectedUser] = useState<exceededUserType | null>(
+        null
+    );
+    const [newRole, setNewRole] = useState<exceededUserType["role"]>("user");
     const [showPopup, setShowPopup] = useState(false);
     // Ticket assign popup state
     const [assignTicket, setAssignTicket] = useState<TicketType | null>(null);
@@ -61,7 +54,7 @@ export default function ManagerDashboardUI({
         setDeleteTicketId(null);
     };
 
-    const handleUserClick = (user: UserType) => {
+    const handleUserClick = (user: exceededUserType) => {
         setSelectedUser(user);
         setNewRole(user.role);
         setShowPopup(true);
@@ -73,7 +66,7 @@ export default function ManagerDashboardUI({
     };
 
     const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setNewRole(e.target.value as UserType["role"]);
+        setNewRole(e.target.value as exceededUserType["role"]);
     };
 
     // Ticket assign popup handlers
@@ -98,11 +91,6 @@ export default function ManagerDashboardUI({
         setAssignUserId("");
     };
 
-    // Sadece admin kullanıcılar için filtrele
-    const technicianUsers = mockUsers.filter(
-        (user) => user.role === "technician"
-    );
-
     return (
         <div className="min-h-screen bg-blue-50 dark:bg-neutral-900 p-4 sm:p-8 transition-colors duration-300 flex flex-col lg:flex-row gap-4 lg:gap-8">
             {/* Left: Users Table */}
@@ -120,47 +108,58 @@ export default function ManagerDashboardUI({
                         </tr>
                     </thead>
                     <tbody>
-                        {mockUsers.map((user) => (
-                            <tr
-                                key={user.id}
-                                className="hover:bg-blue-100 dark:hover:bg-neutral-700 cursor-pointer group"
-                                onClick={() => handleUserClick(user)}
-                            >
-                                <td className="py-2 break-words max-w-[120px]">
-                                    {user.name}
-                                </td>
-                                <td className="py-2 break-all max-w-[140px]">
-                                    {user.email}
-                                </td>
-                                <td className="py-2 capitalize">{user.role}</td>
-                                <td className="py-2 text-center">
-                                    <button
-                                        className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded shadow transition text-xs sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDeleteUser(user.id);
-                                        }}
-                                        title="Kullanıcıyı Sil"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="h-4 w-4"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
+                        {users.map((user) => {
+                            // Ensure user has a role property for exceededUserType
+                            const userWithRole = {
+                                ...user,
+                                role: (user as any).role ?? "user",
+                            } as exceededUserType;
+                            return (
+                                <tr
+                                    key={user.id}
+                                    className="hover:bg-blue-100 dark:hover:bg-neutral-700 cursor-pointer group"
+                                    onClick={() =>
+                                        handleUserClick(userWithRole)
+                                    }
+                                >
+                                    <td className="py-2 break-words max-w-[120px]">
+                                        {user.name}
+                                    </td>
+                                    <td className="py-2 break-all max-w-[140px]">
+                                        {user.email}
+                                    </td>
+                                    <td className="py-2 capitalize">
+                                        {userWithRole.role}
+                                    </td>
+                                    <td className="py-2 text-center">
+                                        <button
+                                            className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded shadow transition text-xs sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteUser(user.id);
+                                            }}
+                                            title="Kullanıcıyı Sil"
                                         >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M6 18L18 6M6 6l12 12"
-                                            />
-                                        </svg>
-                                        Sil
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="h-4 w-4"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M6 18L18 6M6 6l12 12"
+                                                />
+                                            </svg>
+                                            Sil
+                                        </button>
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>
@@ -177,19 +176,6 @@ export default function ManagerDashboardUI({
                 ) : (
                     <div className="space-y-3 sm:space-y-4 max-w-full sm:max-w-3xl mx-auto">
                         {tickets.map((ticket: TicketType) => {
-                            // Atanan admini bul (mock, gerçek backend yok)
-                            // Eğer ticket.assignedAdminId yoksa, ticket objesine ekle (mock)
-                            // Demo için ticket._id'nin son hanesine göre admin ata
-                            let assignedAdminId = undefined;
-                            if (ticket._id) {
-                                const idx =
-                                    parseInt(ticket._id.slice(-1), 10) %
-                                    technicianUsers.length;
-                                assignedAdminId = technicianUsers[idx]?.id;
-                            }
-                            const assignedAdmin = technicianUsers.find(
-                                (u) => u.id === assignedAdminId
-                            );
                             return (
                                 <div
                                     key={ticket._id}
@@ -200,8 +186,8 @@ export default function ManagerDashboardUI({
                                         {/* Atanan admin gösterimi */}
                                         <div className="mt-2 text-sm text-gray-500 dark:text-gray-300">
                                             Atanan:{" "}
-                                            {assignedAdmin
-                                                ? `${assignedAdmin.name} (${assignedAdmin.email})`
+                                            {ticket.assignInfo?.assignedTo
+                                                ? `${ticket.assignInfo.assignedTechnicianName}`
                                                 : "Atanmamış"}
                                         </div>
                                     </div>
@@ -321,7 +307,7 @@ export default function ManagerDashboardUI({
                             onChange={handleAssignUserChange}
                         >
                             <option value="">Kullanıcı seçin</option>
-                            {technicianUsers.map((user) => (
+                            {technicians.map((user) => (
                                 <option
                                     key={user.id}
                                     value={user.id}

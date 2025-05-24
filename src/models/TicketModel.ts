@@ -5,7 +5,11 @@ export type TicketType = {
     priority: "Low" | "Medium" | "High";
     status: "Open" | "In Progress" | "Resolved" | "Closed";
     userId: string;
-    assignedTo?: string;
+    assignInfo?: {
+        assignedTo: string;
+        assignedTechnicianName: string;
+        assignedAt: Date;
+    };
     department: string;
     user: string;
     createdAt: Date;

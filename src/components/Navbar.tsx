@@ -25,14 +25,14 @@ export default async function Navbar() {
                             >
                                 Manager Dashboard
                             </Link>
-                        ) : (
+                        ) : session.user.role === "technician" ? (
                             <Link
                                 href="/dashboard/technician"
                                 className="hover:underline transition"
                             >
                                 Technician Dashboard
                             </Link>
-                        )}
+                        ) : null}
                         <Link
                             href="/tickets/new"
                             className="hover:underline transition"

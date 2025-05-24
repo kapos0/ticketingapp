@@ -53,6 +53,7 @@ export default function SignUpPage() {
             {
                 email: data.email,
                 password: data.password,
+                role: "user",
                 name: data.username,
             },
             {

@@ -6,9 +6,9 @@ import { clientDB } from "@/lib/dbClient";
 import { TicketType, validateTicket } from "@/models/TicketModel";
 import { ObjectId } from "mongodb";
 
-async function getCollection() {
+export async function getCollection(collectionName: string) {
     const db = await clientDB();
-    const collection = db.collection("tickets");
+    const collection = db.collection(collectionName);
     return collection;
 }
 
@@ -43,16 +43,25 @@ export async function createTicket(
             department,
             priority: priority as "Low" | "Medium" | "High",
             status: "Open",
-            assignedTo: "",
+            assignInfo: {
+                assignedTo: "",
+                assignedTechnicianName: "",
+                assignedAt: new Date(),
+            },
             createdAt: new Date(),
             userId,
         };
         if (validateTicket(ticket)) {
-            (await getCollection()).insertOne({
+            (await getCollection("tickets")).insertOne({
                 subject,
                 user: createdBy,
                 description,
                 department,
+                assignInfo: {
+                    assignedTo: "",
+                    assignedTechnicianName: "",
+                    assignedAt: null,
+                },
                 assignedTo: "",
                 priority,
                 status: "Open",
@@ -75,7 +84,7 @@ export async function getTicketById(id: string) {
     try {
         const objectId = new ObjectId(id);
         const ticket = (await (
-            await getCollection()
+            await getCollection("tickets")
         ).findOne({ _id: objectId })) as unknown as TicketType;
         return ticket;
     } catch (error) {
@@ -89,12 +98,12 @@ export async function getTickets(isAttendant: boolean) {
     try {
         if (!isAttendant) {
             const userId = await getUserId();
-            tickets = (await getCollection())
+            tickets = (await getCollection("tickets"))
                 .find({ userId })
                 .sort({ createdAt: -1 })
                 .toArray();
         } else
-            tickets = (await getCollection())
+            tickets = (await getCollection("tickets"))
                 .find({})
                 .sort({ createdAt: -1 })
                 .toArray();
@@ -108,8 +117,8 @@ export async function getTickets(isAttendant: boolean) {
 export async function getAssignedTickets(technicianId: string) {
     let tickets;
     try {
-        tickets = (await getCollection())
-            .find({ assignedTo: technicianId })
+        tickets = (await getCollection("tickets"))
+            .find({ assignInfo: { assignedTo: technicianId } })
             .sort({ createdAt: -1 })
             .toArray();
         return tickets as unknown as TicketType[];
@@ -119,20 +128,34 @@ export async function getAssignedTickets(technicianId: string) {
     }
 }
 
-export async function assignTicket(ticketId: string, technicianId: string) {
+export async function assignTicket(
+    ticketId: string,
+    technicianId: string,
+    technicianName: string
+) {
     try {
-        if (!ticketId || !technicianId)
+        if (!ticketId || !technicianId || !technicianName)
             return {
                 success: false,
                 message: "Ticket ID and Technician ID are required!",
             };
         const objectId = new ObjectId(ticketId);
-        const ticket = (await getCollection()).findOne({ _id: objectId });
+        const ticket = (await getCollection("tickets")).findOne({
+            _id: objectId,
+        });
         if (!ticket) return { success: false, message: "Ticket not found!" };
 
-        (await getCollection()).updateOne(
+        (await getCollection("tickets")).updateOne(
             { _id: objectId },
-            { $set: { assignedTo: technicianId } }
+            {
+                $set: {
+                    assignInfo: {
+                        assignedTo: technicianId,
+                        assignedTechnicianName: technicianName,
+                        assignedAt: new Date(),
+                    },
+                },
+            }
         );
         revalidatePath("/tickets");
         return { success: true, message: "Ticket Assigned Successfully!" };
@@ -154,10 +177,12 @@ export async function closeTicket(
         if (!ticketId)
             return { success: false, message: "Ticket ID is required!" };
         const objectId = new ObjectId(ticketId);
-        const ticket = (await getCollection()).findOne({ _id: objectId });
+        const ticket = (await getCollection("tickets")).findOne({
+            _id: objectId,
+        });
         if (!ticket) return { success: false, message: "Ticket not found!" };
 
-        (await getCollection()).updateOne(
+        (await getCollection("tickets")).updateOne(
             { _id: objectId },
             { $set: { status: "Closed" } }
         );
@@ -175,10 +200,12 @@ export async function closeTicket(
 export async function deleteTicket(id: string) {
     try {
         const objectId = new ObjectId(id);
-        const ticket = (await getCollection()).findOne({ _id: objectId });
+        const ticket = (await getCollection("tickets")).findOne({
+            _id: objectId,
+        });
         if (!ticket) return { success: false, message: "Ticket not found!" };
 
-        (await getCollection()).deleteOne({ _id: objectId });
+        (await getCollection("tickets")).deleteOne({ _id: objectId });
         revalidatePath("/tickets");
         return { success: true, message: "Ticket Deleted Successfully!" };
     } catch (error) {
