@@ -2,11 +2,14 @@
 import React, { useState } from "react";
 import { TicketType } from "@/models/TicketModel";
 import TicketItem from "@/components/TicketItem";
-import { User } from "better-auth";
-
-type exceededUserType = User & {
-    role: "user" | "technician" | "manager";
-};
+import { UserType } from "@/models/UserModel";
+import { deleteUser, updateUserRole } from "@/actions/UserActions";
+import { toast } from "react-toastify";
+import {
+    deleteTicket,
+    assignTicketToTechnician,
+} from "@/actions/TicketActions";
+import { set } from "better-auth";
 
 export default function ManagerDashboardUI({
     tickets,
@@ -14,82 +17,102 @@ export default function ManagerDashboardUI({
     technicians,
 }: {
     tickets: TicketType[];
-    users: exceededUserType[];
-    technicians: exceededUserType[];
+    users: UserType[];
+    technicians: UserType[];
 }) {
-    const roles: exceededUserType["role"][] = ["user", "technician", "manager"];
-
-    const [selectedUser, setSelectedUser] = useState<exceededUserType | null>(
-        null
-    );
-    const [newRole, setNewRole] = useState<exceededUserType["role"]>("user");
+    const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
+    const [newRole, setNewRole] = useState<UserType["role"]>("user");
     const [showPopup, setShowPopup] = useState(false);
     // Ticket assign popup state
     const [assignTicket, setAssignTicket] = useState<TicketType | null>(null);
+    const [selectedTechnician, setSelectedTechnician] =
+        useState<UserType | null>(null);
     const [assignUserId, setAssignUserId] = useState<string>("");
     const [showAssignPopup, setShowAssignPopup] = useState(false);
 
     // Kullanıcı silme
     const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
-    const handleDeleteUser = (userId: string) => {
+    async function handleDeleteUser(userId: string) {
         setDeleteUserId(userId);
-    };
-    const confirmDeleteUser = () => {
-        alert(`Kullanıcı silindi (Mock): ${deleteUserId}`);
+    }
+    async function confirmDeleteUser() {
+        if (!deleteUserId) return;
+        const res = await deleteUser(deleteUserId);
+        if (res && res.success) toast.success("Kullanıcı başarıyla silindi.");
+        else toast.error("Kullanıcı silinemedi.");
         setDeleteUserId(null);
-    };
-    const cancelDeleteUser = () => {
+    }
+    async function cancelDeleteUser() {
         setDeleteUserId(null);
-    };
+    }
     // Ticket silme
     const [deleteTicketId, setDeleteTicketId] = useState<string | null>(null);
-    const handleDeleteTicket = (ticketId: string) => {
+    async function handleDeleteTicket(ticketId: string) {
         setDeleteTicketId(ticketId);
-    };
-    const confirmDeleteTicket = () => {
-        alert(`Ticket silindi (Mock): ${deleteTicketId}`);
+    }
+    async function confirmDeleteTicket() {
+        if (!deleteTicketId) return;
+        const res = await deleteTicket(deleteTicketId);
+        if (res && res.success) toast.success("Ticket başarıyla silindi.");
+        else toast.error("Ticket silinemedi.");
         setDeleteTicketId(null);
-    };
-    const cancelDeleteTicket = () => {
+    }
+    async function cancelDeleteTicket() {
         setDeleteTicketId(null);
-    };
+    }
 
-    const handleUserClick = (user: exceededUserType) => {
+    function handleUserClick(user: UserType) {
         setSelectedUser(user);
         setNewRole(user.role);
         setShowPopup(true);
-    };
+    }
 
-    const handleClose = () => {
+    function handleClose() {
         setShowPopup(false);
         setSelectedUser(null);
-    };
+    }
 
-    const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setNewRole(e.target.value as exceededUserType["role"]);
-    };
+    async function handleRoleChange(e: React.ChangeEvent<HTMLSelectElement>) {
+        setNewRole(e.target.value as UserType["role"]);
+        if (!selectedUser) return;
+        const res = await updateUserRole(selectedUser?.id, e.target.value);
+        if (res && res.success)
+            toast.success("Kullanıcı rolü başarıyla değiştirildi.");
+        else toast.error("Kullanıcı rolü güncellenemedi.");
+    }
 
-    // Ticket assign popup handlers
-    const handleAssignClick = (ticket: TicketType) => {
+    function handleAssignClick(ticket: TicketType) {
         setAssignTicket(ticket);
         setAssignUserId("");
         setShowAssignPopup(true);
-    };
-    const handleAssignUserChange = (
+    }
+    async function handleAssignUserChange(
         e: React.ChangeEvent<HTMLSelectElement>
-    ) => {
+    ) {
         setAssignUserId(e.target.value);
-    };
-    const handleAssignSave = () => {
+    }
+    async function handleAssignSave() {
+        if (!assignTicket || !assignUserId) return;
+        if (!selectedTechnician) return;
+        const res = await assignTicketToTechnician(
+            assignTicket._id!,
+            assignTicket.subject,
+            assignTicket.description,
+            assignUserId,
+            selectedTechnician.email,
+            selectedTechnician.name
+        );
         setShowAssignPopup(false);
         setAssignTicket(null);
         setAssignUserId("");
-    };
-    const handleAssignClose = () => {
+        if (res && res.success) toast.success("Ticket başarıyla atandı.");
+        else toast.error(res.message);
+    }
+    async function handleAssignClose() {
         setShowAssignPopup(false);
         setAssignTicket(null);
         setAssignUserId("");
-    };
+    }
 
     return (
         <div className="min-h-screen bg-blue-50 dark:bg-neutral-900 p-4 sm:p-8 transition-colors duration-300 flex flex-col lg:flex-row gap-4 lg:gap-8">
@@ -108,19 +131,12 @@ export default function ManagerDashboardUI({
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map((user) => {
-                            // Ensure user has a role property for exceededUserType
-                            const userWithRole = {
-                                ...user,
-                                role: (user as any).role ?? "user",
-                            } as exceededUserType;
+                        {users.map((user: UserType) => {
                             return (
                                 <tr
                                     key={user.id}
                                     className="hover:bg-blue-100 dark:hover:bg-neutral-700 cursor-pointer group"
-                                    onClick={() =>
-                                        handleUserClick(userWithRole)
-                                    }
+                                    onClick={() => handleUserClick(user)}
                                 >
                                     <td className="py-2 break-words max-w-[120px]">
                                         {user.name}
@@ -129,7 +145,7 @@ export default function ManagerDashboardUI({
                                         {user.email}
                                     </td>
                                     <td className="py-2 capitalize">
-                                        {userWithRole.role}
+                                        {user.role}
                                     </td>
                                     <td className="py-2 text-center">
                                         <button
@@ -260,13 +276,13 @@ export default function ManagerDashboardUI({
                             value={newRole}
                             onChange={handleRoleChange}
                         >
-                            {roles.map((role) => (
+                            {users.map((user: UserType) => (
                                 <option
-                                    key={role}
-                                    value={role}
+                                    key={user.id}
+                                    value={user.role}
                                     className="capitalize"
                                 >
-                                    {role}
+                                    {user.role}
                                 </option>
                             ))}
                         </select>
@@ -274,7 +290,7 @@ export default function ManagerDashboardUI({
                             className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200"
                             onClick={handleClose}
                         >
-                            Kaydet (Mock)
+                            Kaydet
                         </button>
                     </div>
                 </div>
@@ -304,7 +320,13 @@ export default function ManagerDashboardUI({
                         <select
                             className="w-full p-2 rounded border border-blue-200 dark:border-neutral-700 bg-blue-50 dark:bg-neutral-900"
                             value={assignUserId}
-                            onChange={handleAssignUserChange}
+                            onChange={(e) => {
+                                handleAssignUserChange(e);
+                                const selected = technicians.find(
+                                    (user) => user.id === e.target.value
+                                );
+                                setSelectedTechnician(selected || null);
+                            }}
                         >
                             <option value="">Kullanıcı seçin</option>
                             {technicians.map((user) => (
@@ -322,7 +344,7 @@ export default function ManagerDashboardUI({
                             onClick={handleAssignSave}
                             disabled={!assignUserId}
                         >
-                            Kaydet (Mock)
+                            Kaydet
                         </button>
                     </div>
                 </div>

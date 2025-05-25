@@ -8,12 +8,10 @@ import TechnicianTabs from "@/components/TechnicianTabs";
 export default async function TechnicianDashboardPage() {
     const session = await auth.api.getSession({ headers: await headers() });
     if (!(session?.user.role === "technician")) redirect("/auth/sign-in");
-
     const [assignedTickets, allTickets] = await Promise.all([
         getAssignedTickets(session?.user.id || ""),
         getTickets(true),
     ]);
-
     function serializeTicket(ticket: TicketType): TicketType {
         return {
             ...ticket,

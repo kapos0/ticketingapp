@@ -21,7 +21,9 @@ export default function TicketItem({ ticket }: TicketItemProps) {
                 </h1>
                 <h3 className="text-sm mt-2 text-gray-500 dark:text-gray-200 transition-colors duration-300">
                     Assigned To:
-                    {ticket.assignedTo !== "" ? ticket.assignedTo : "no one"}
+                    {ticket.assignInfo?.assignedTechnicianName !== ""
+                        ? ticket.assignInfo?.assignedTechnicianName
+                        : "no one"}
                 </h3>
                 <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-300 transition-colors duration-300">
                     {ticket.subject}
@@ -33,6 +35,10 @@ export default function TicketItem({ ticket }: TicketItemProps) {
                     <span className={getPriorityClass(ticket.priority)}>
                         {ticket.priority}
                     </span>
+                </div>
+                <div className="text-sm text-gray-500 dark:text-gray-200 transition-colors duration-300">
+                    Department:
+                    <span>{ticket.department}</span>
                 </div>
                 <Link
                     href={`/tickets/${ticket._id}`}

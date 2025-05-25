@@ -17,7 +17,7 @@ export default function Home() {
                     href="/tickets/new"
                     className="px-6 py-3 rounded shadow transition"
                 >
-                    Submit a Ticket dasdadsa
+                    Submit a Ticket
                 </Link>
                 <Link
                     href="/tickets"

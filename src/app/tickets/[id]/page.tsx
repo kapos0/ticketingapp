@@ -21,7 +21,12 @@ export default async function TicketDetailsPage(props: {
         user: ticketData.user,
         description: ticketData.description,
         department: ticketData.department,
-        assignedTo: ticketData.assignedTo,
+        assignInfo: {
+            assignedTo: ticketData.assignInfo?.assignedTo ?? "",
+            assignedAt: ticketData.assignInfo?.assignedAt ?? new Date(0),
+            assignedTechnicianName:
+                ticketData.assignInfo?.assignedTechnicianName ?? "",
+        },
         priority: ticketData.priority,
         createdAt: ticketData.createdAt,
         status: ticketData.status,
@@ -49,8 +54,8 @@ export default async function TicketDetailsPage(props: {
                 <div className="text-gray-700 dark:text-gray-200">
                     <p className="mb-2">Assigned To</p>
                     <p>
-                        {ticket.assignedTo !== ""
-                            ? ticket.assignedTo
+                        {ticket.assignInfo?.assignedTechnicianName !== ""
+                            ? ticket.assignInfo?.assignedTechnicianName
                             : "no one"}
                     </p>
                 </div>
@@ -60,6 +65,11 @@ export default async function TicketDetailsPage(props: {
                     <p className={getPriorityClass(ticket.priority)}>
                         {ticket.priority}
                     </p>
+                </div>
+
+                <div className="text-gray-700 dark:text-gray-200">
+                    <h2 className="text-lg font-semibold mb-2">Department</h2>
+                    <p>{ticket.department}</p>
                 </div>
 
                 <div className="text-gray-700 dark:text-gray-200">

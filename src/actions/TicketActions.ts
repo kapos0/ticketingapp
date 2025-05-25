@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { clientDB } from "@/lib/dbClient";
 import { TicketType, validateTicket } from "@/models/TicketModel";
 import { ObjectId } from "mongodb";
+import { notifyTechnician } from "./UserActions";
 
 export async function getCollection(collectionName: string) {
     const db = await clientDB();
@@ -115,9 +116,8 @@ export async function getTickets(isAttendant: boolean) {
 }
 
 export async function getAssignedTickets(technicianId: string) {
-    let tickets;
     try {
-        tickets = (await getCollection("tickets"))
+        let tickets = (await getCollection("tickets"))
             .find({ assignInfo: { assignedTo: technicianId } })
             .sort({ createdAt: -1 })
             .toArray();
@@ -128,17 +128,28 @@ export async function getAssignedTickets(technicianId: string) {
     }
 }
 
-export async function assignTicket(
+export async function assignTicketToTechnician(
     ticketId: string,
+    ticketSubject: string,
+    ticketDescription: string,
     technicianId: string,
+    technicianEmail: string,
     technicianName: string
 ) {
     try {
-        if (!ticketId || !technicianId || !technicianName)
+        if (
+            !ticketId ||
+            !technicianId ||
+            !technicianName ||
+            !technicianEmail ||
+            !ticketSubject ||
+            !ticketDescription
+        )
             return {
                 success: false,
                 message: "Ticket ID and Technician ID are required!",
             };
+
         const objectId = new ObjectId(ticketId);
         const ticket = (await getCollection("tickets")).findOne({
             _id: objectId,
@@ -158,6 +169,11 @@ export async function assignTicket(
             }
         );
         revalidatePath("/tickets");
+        await notifyTechnician(
+            technicianEmail,
+            ticketSubject,
+            ticketDescription
+        );
         return { success: true, message: "Ticket Assigned Successfully!" };
     } catch (error) {
         console.error("Error assigning ticket:", error);
