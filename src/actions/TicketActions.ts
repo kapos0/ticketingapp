@@ -117,8 +117,8 @@ export async function getTickets(isAttendant: boolean) {
 
 export async function getAssignedTickets(technicianId: string) {
     try {
-        let tickets = (await getCollection("tickets"))
-            .find({ assignInfo: { assignedTo: technicianId } })
+        let tickets = await (await getCollection("tickets"))
+            .find({ "assignInfo.assignedTo": technicianId })
             .sort({ createdAt: -1 })
             .toArray();
         return tickets as unknown as TicketType[];
