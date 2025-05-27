@@ -6,7 +6,7 @@ import { ObjectId } from "mongodb";
 
 export async function getUsers() {
     try {
-        const users = (await getCollection("user")).find({}).toArray();
+        const users = await (await getCollection("user")).find({}).toArray();
         return users;
     } catch (error) {
         console.error("Error fetching users:", error);
@@ -16,7 +16,7 @@ export async function getUsers() {
 
 export async function getlAllTechnicians() {
     try {
-        const technicians = (await getCollection("user"))
+        const technicians = await (await getCollection("user"))
             .find({ role: "technician" })
             .toArray();
         return technicians;

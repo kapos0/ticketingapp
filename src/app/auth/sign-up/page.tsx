@@ -61,7 +61,7 @@ export default function SignUpPage() {
                     setLoading(true);
                 },
                 onSuccess: () => {
-                    toast("Account created");
+                    toast("Account created, Please check your email to verify your account.");
                     form.reset();
                     console.log("success");
                 },

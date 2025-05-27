@@ -53,7 +53,7 @@ export async function createTicket(
             userId,
         };
         if (validateTicket(ticket)) {
-            (await getCollection("tickets")).insertOne({
+           await (await getCollection("tickets")).insertOne({
                 subject,
                 user: createdBy,
                 description,
@@ -99,12 +99,12 @@ export async function getTickets(isAttendant: boolean) {
     try {
         if (!isAttendant) {
             const userId = await getUserId();
-            tickets = (await getCollection("tickets"))
+            tickets = await (await getCollection("tickets"))
                 .find({ userId })
                 .sort({ createdAt: -1 })
                 .toArray();
         } else
-            tickets = (await getCollection("tickets"))
+            tickets = await (await getCollection("tickets"))
                 .find({})
                 .sort({ createdAt: -1 })
                 .toArray();
@@ -117,7 +117,7 @@ export async function getTickets(isAttendant: boolean) {
 
 export async function getAssignedTickets(technicianId: string) {
     try {
-        let tickets = await (await getCollection("tickets"))
+        const tickets = await (await getCollection("tickets"))
             .find({ "assignInfo.assignedTo": technicianId })
             .sort({ createdAt: -1 })
             .toArray();

@@ -9,7 +9,6 @@ import {
     deleteTicket,
     assignTicketToTechnician,
 } from "@/actions/TicketActions";
-import { set } from "better-auth";
 
 export default function ManagerDashboardUI({
     tickets,
@@ -276,13 +275,9 @@ export default function ManagerDashboardUI({
                             value={newRole}
                             onChange={handleRoleChange}
                         >
-                            {users.map((user: UserType) => (
-                                <option
-                                    key={user.id}
-                                    value={user.role}
-                                    className="capitalize"
-                                >
-                                    {user.role}
+                            {["user", "technician", "manager"].map((role) => (
+                                <option key={role} value={role} className="capitalize">
+                                    {role}
                                 </option>
                             ))}
                         </select>
