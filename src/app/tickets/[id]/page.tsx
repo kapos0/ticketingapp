@@ -36,8 +36,8 @@ export default async function TicketDetailsPage(props: {
     const isClosed = ticket.status === "Closed";
 
     return (
-        <div className="min-h-screen bg-blue-50 dark:bg-gray-900 p-8">
-            <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-8 space-y-6">
+        <div className="min-h-screen bg-blue-50 dark:bg-black p-8">
+            <div className="max-w-2xl mx-auto bg-white dark:bg-black rounded-lg shadow border border-gray-200 dark:border-gray-700 p-8 space-y-6">
                 <h1 className="text-3xl font-bold text-blue-600 dark:text-blue-300">
                     {ticket.subject}
                 </h1>

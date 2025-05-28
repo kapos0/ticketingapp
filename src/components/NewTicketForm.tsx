@@ -20,7 +20,7 @@ export default function NewTicketForm({ user }: { user: string }) {
     }, [state.success, router]);
 
     return (
-        <div className="w-full max-w-md shadow-md rounded-lg p-8 border border-gray-200 bg-white text-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700">
+        <div className="w-full max-w-md shadow-md rounded-lg p-8 border border-gray-200 bg-white text-gray-700 dark:bg-black dark:text-gray-100 dark:border-gray-700">
             <h1 className="text-3xl font-bold mb-6 text-center text-blue-600 dark:text-blue-400">
                 Submit a Support Ticket
             </h1>
@@ -37,19 +37,19 @@ export default function NewTicketForm({ user }: { user: string }) {
                     defaultValue={user}
                 />
                 <input
-                    className="w-full border border-gray-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+                    className="w-full border border-gray-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-700 dark:bg-black dark:text-gray-100 dark:border-gray-700"
                     type="text"
                     name="subject"
                     placeholder="Subject"
                 />
                 <textarea
-                    className="w-full border border-gray-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+                    className="w-full border border-gray-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-700 dark:bg-black dark:text-gray-100 dark:border-gray-700"
                     name="description"
                     placeholder="Describe your issue"
                     rows={4}
                 />
                 <select
-                    className="w-full border border-gray-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+                    className="w-full border border-gray-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-700 dark:bg-black dark:text-gray-100 dark:border-gray-700"
                     name="priority"
                     defaultValue="Low"
                 >
@@ -58,7 +58,7 @@ export default function NewTicketForm({ user }: { user: string }) {
                     <option value="High">High Priority</option>
                 </select>
                 <select
-                    className="w-full border border-gray-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700"
+                    className="w-full border border-gray-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-700 dark:bg-black dark:text-gray-100 dark:border-gray-700"
                     name="department"
                     defaultValue="Genaral"
                 >
