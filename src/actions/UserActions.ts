@@ -4,9 +4,10 @@ import { getCollection } from "./TicketActions";
 import { revalidatePath } from "next/cache";
 import { ObjectId } from "mongodb";
 
+
 export async function getUsers() {
     try {
-        const users = await (await getCollection("user")).find({}).toArray();
+        const users = await (await getCollection("users")).find({}).toArray();
         return users;
     } catch (error) {
         console.error("Error fetching users:", error);
@@ -16,7 +17,7 @@ export async function getUsers() {
 
 export async function getlAllTechnicians() {
     try {
-        const technicians = await (await getCollection("user"))
+        const technicians = await (await getCollection("users"))
             .find({ role: "technician" })
             .toArray();
         return technicians;
@@ -30,16 +31,12 @@ export async function deleteUser(userId: string) {
     try {
         if (!userId) return { success: false, message: "User ID is required." };
 
-        await (
-            await getCollection("user")
-        ).deleteOne({ _id: new ObjectId(userId) });
+        const userCollection = await getCollection("users");
+        const ticketCollection = await getCollection("tickets");
 
-        //deleting the tickets which created by this user
-        await (
-            await getCollection("tickets")
-        ).deleteMany({
-            userId: userId,
-        });
+        await userCollection.deleteOne({ _id: new ObjectId(userId) });
+        await ticketCollection.deleteMany({ userId });
+
         console.log(`User with ID ${userId} deleted successfully.`);
         revalidatePath("/");
         return {
@@ -60,9 +57,11 @@ export async function updateUserRole(userId: string, newRole: string) {
                 message: "User ID and new role are required.",
             };
 
-        const result = await (
-            await getCollection("user")
-        ).updateOne({ _id: new ObjectId(userId) }, { $set: { role: newRole } });
+        const userCollection = await getCollection("users");
+        const result = await userCollection.updateOne(
+            { _id: new ObjectId(userId) },
+            { $set: { role: newRole } }
+        );
         if (result.modifiedCount > 0) {
             console.log(`User with ID ${userId} updated to role ${newRole}.`);
             revalidatePath("/");

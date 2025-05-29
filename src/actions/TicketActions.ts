@@ -9,8 +9,7 @@ import { notifyTechnician } from "./UserActions";
 
 export async function getCollection(collectionName: string) {
     const db = await clientDB();
-    const collection = db.collection(collectionName);
-    return collection;
+    return db.collection(collectionName);
 }
 
 async function getUserId() {
@@ -18,7 +17,6 @@ async function getUserId() {
         headers: await headers(),
     });
     if (!session?.user) throw new Error("User not authenticated");
-
     return session.user.id;
 }
 
@@ -36,7 +34,6 @@ export async function createTicket(
             return { success: false, message: "All fields are required!" };
 
         const userId = await getUserId();
-
         const ticket: TicketType = {
             user: createdBy,
             subject,
@@ -52,26 +49,28 @@ export async function createTicket(
             createdAt: new Date(),
             userId,
         };
-        if (validateTicket(ticket)) {
-           await (await getCollection("tickets")).insertOne({
-                subject,
-                user: createdBy,
-                description,
-                department,
-                assignInfo: {
-                    assignedTo: "",
-                    assignedTechnicianName: "",
-                    assignedAt: null,
-                },
+        if (!validateTicket(ticket)) {
+            return { success: false, message: "Invalid ticket data!" };
+        }
+        const ticketsCol = await getCollection("tickets");
+        await ticketsCol.insertOne({
+            subject,
+            user: createdBy,
+            description,
+            department,
+            assignInfo: {
                 assignedTo: "",
-                priority,
-                status: "Open",
-                createdAt: new Date(),
-                userId,
-            });
-            revalidatePath("/tickets");
-            return { success: true, message: "Ticket Created Succesfully!" };
-        } else return { success: false, message: "Invalid ticket data!" };
+                assignedTechnicianName: "",
+                assignedAt: null,
+            },
+            assignedTo: "",
+            priority,
+            status: "Open",
+            createdAt: new Date(),
+            userId,
+        });
+        revalidatePath("/tickets");
+        return { success: true, message: "Ticket Created Succesfully!" };
     } catch (error) {
         console.error("Error creating ticket:", error);
         return {
@@ -84,9 +83,8 @@ export async function createTicket(
 export async function getTicketById(id: string) {
     try {
         const objectId = new ObjectId(id);
-        const ticket = (await (
-            await getCollection("tickets")
-        ).findOne({ _id: objectId })) as unknown as TicketType;
+        const ticketsCol = await getCollection("tickets");
+        const ticket = (await ticketsCol.findOne({ _id: objectId })) as unknown as TicketType;
         return ticket;
     } catch (error) {
         console.error("Error fetching ticket by ID:", error);
@@ -95,19 +93,17 @@ export async function getTicketById(id: string) {
 }
 
 export async function getTickets(isAttendant: boolean) {
-    let tickets;
     try {
+        const ticketsCol = await getCollection("tickets");
+        let query = {};
         if (!isAttendant) {
             const userId = await getUserId();
-            tickets = await (await getCollection("tickets"))
-                .find({ userId })
-                .sort({ createdAt: -1 })
-                .toArray();
-        } else
-            tickets = await (await getCollection("tickets"))
-                .find({})
-                .sort({ createdAt: -1 })
-                .toArray();
+            query = { userId };
+        }
+        const tickets = await ticketsCol
+            .find(query)
+            .sort({ createdAt: -1 })
+            .toArray();
         return tickets as unknown as TicketType[];
     } catch (error) {
         console.error("Error fetching tickets:", error);
@@ -117,7 +113,8 @@ export async function getTickets(isAttendant: boolean) {
 
 export async function getAssignedTickets(technicianId: string) {
     try {
-        const tickets = await (await getCollection("tickets"))
+        const ticketsCol = await getCollection("tickets");
+        const tickets = await ticketsCol
             .find({ "assignInfo.assignedTo": technicianId })
             .sort({ createdAt: -1 })
             .toArray();
@@ -151,12 +148,11 @@ export async function assignTicketToTechnician(
             };
 
         const objectId = new ObjectId(ticketId);
-        const ticket = (await getCollection("tickets")).findOne({
-            _id: objectId,
-        });
+        const ticketsCol = await getCollection("tickets");
+        const ticket = await ticketsCol.findOne({ _id: objectId });
         if (!ticket) return { success: false, message: "Ticket not found!" };
 
-        (await getCollection("tickets")).updateOne(
+        await ticketsCol.updateOne(
             { _id: objectId },
             {
                 $set: {
@@ -193,12 +189,11 @@ export async function closeTicket(
         if (!ticketId)
             return { success: false, message: "Ticket ID is required!" };
         const objectId = new ObjectId(ticketId);
-        const ticket = (await getCollection("tickets")).findOne({
-            _id: objectId,
-        });
+        const ticketsCol = await getCollection("tickets");
+        const ticket = await ticketsCol.findOne({ _id: objectId });
         if (!ticket) return { success: false, message: "Ticket not found!" };
 
-        (await getCollection("tickets")).updateOne(
+        await ticketsCol.updateOne(
             { _id: objectId },
             { $set: { status: "Closed" } }
         );
@@ -216,12 +211,11 @@ export async function closeTicket(
 export async function deleteTicket(id: string) {
     try {
         const objectId = new ObjectId(id);
-        const ticket = (await getCollection("tickets")).findOne({
-            _id: objectId,
-        });
+        const ticketsCol = await getCollection("tickets");
+        const ticket = await ticketsCol.findOne({ _id: objectId });
         if (!ticket) return { success: false, message: "Ticket not found!" };
 
-        (await getCollection("tickets")).deleteOne({ _id: objectId });
+        await ticketsCol.deleteOne({ _id: objectId });
         revalidatePath("/tickets");
         return { success: true, message: "Ticket Deleted Successfully!" };
     } catch (error) {
