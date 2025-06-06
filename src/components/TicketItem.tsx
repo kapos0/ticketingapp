@@ -8,9 +8,11 @@ type TicketItemProps = {
 
 export default function TicketItem({ ticket }: TicketItemProps) {
     const isClosed = ticket.status === "Closed";
+    const assignedTo = ticket.assignInfo?.assignedTechnicianName?.trim()
+        ? ticket.assignInfo.assignedTechnicianName
+        : "no one";
     return (
         <div
-            key={ticket._id}
             className={`flex justify-between items-center bg-white dark:bg-neutral-900 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300 ${
                 isClosed ? "opacity-50" : ""
             }`}
@@ -20,10 +22,7 @@ export default function TicketItem({ ticket }: TicketItemProps) {
                     Created by: {ticket.user}
                 </h1>
                 <h3 className="text-sm mt-2 text-gray-500 dark:text-gray-200 transition-colors duration-300">
-                    Assigned To:
-                    {ticket.assignInfo?.assignedTechnicianName !== ""
-                        ? ticket.assignInfo?.assignedTechnicianName
-                        : "no one"}
+                    Assigned To: {assignedTo}
                 </h3>
                 <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-300 transition-colors duration-300">
                     {ticket.subject}

@@ -11,6 +11,18 @@ export default function TechnicianTabs({
     all: TicketType[];
 }) {
     const [tab, setTab] = useState<"assigned" | "all">("assigned");
+    function renderTickets(tickets: TicketType[], emptyMsg: string) {
+        if (tickets.length === 0) {
+            return <p className="text-center text-gray-600 dark:text-gray-200">{emptyMsg}</p>;
+        }
+        return (
+            <div className="space-y-4">
+                {tickets.map((ticket: TicketType) => (
+                    <TicketItem key={ticket._id} ticket={ticket} />
+                ))}
+            </div>
+        );
+    }
     return (
         <div className="max-w-3xl mx-auto">
             <div className="flex justify-center mb-6">
@@ -36,31 +48,9 @@ export default function TechnicianTabs({
                 </button>
             </div>
             <div className="bg-white dark:bg-neutral-800 rounded-b-lg shadow p-6 min-h-[200px] transition-colors duration-300">
-                {tab === "assigned" ? (
-                    assigned.length === 0 ? (
-                        <p className="text-center text-gray-600 dark:text-gray-200">
-                            There are no assigned tickets.
-                        </p>
-                    ) : (
-                        <div className="space-y-4">
-                            {assigned.map((ticket: TicketType) => (
-                                <TicketItem key={ticket._id} ticket={ticket} />
-                            ))}
-                            <p>Selam</p>
-                        </div>
-                    )
-                ) : all.length === 0 ? (
-                    <p className="text-center text-gray-600 dark:text-gray-200">
-                        There are no tickets.
-                    </p>
-                ) : (
-                    <div className="space-y-4">
-                        {all.map((ticket: TicketType) => (
-                            <TicketItem key={ticket._id} ticket={ticket} />
-                        ))}
-                        <p>Selam</p>
-                    </div>
-                )}
+                {tab === "assigned"
+                    ? renderTickets(assigned, "There are no assigned tickets.")
+                    : renderTickets(all, "There are no tickets.")}
             </div>
         </div>
     );

@@ -19,6 +19,8 @@ export default function NewTicketForm({ user }: { user: string }) {
         }
     }, [state.success, router]);
 
+    const inputClass =
+        "w-full border border-gray-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-700 dark:bg-black dark:text-gray-100 dark:border-gray-700";
     return (
         <div className="w-full max-w-md shadow-md rounded-lg p-8 border border-gray-200 bg-white text-gray-700 dark:bg-black dark:text-gray-100 dark:border-gray-700">
             <h1 className="text-3xl font-bold mb-6 text-center text-blue-600 dark:text-blue-400">
@@ -30,26 +32,21 @@ export default function NewTicketForm({ user }: { user: string }) {
                 </p>
             )}
             <form action={formAction} className="space-y-4">
+                <input hidden type="text" name="createdBy" defaultValue={user} />
                 <input
-                    hidden
-                    type="text"
-                    name="createdBy"
-                    defaultValue={user}
-                />
-                <input
-                    className="w-full border border-gray-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-700 dark:bg-black dark:text-gray-100 dark:border-gray-700"
+                    className={inputClass}
                     type="text"
                     name="subject"
                     placeholder="Subject"
                 />
                 <textarea
-                    className="w-full border border-gray-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-700 dark:bg-black dark:text-gray-100 dark:border-gray-700"
+                    className={inputClass}
                     name="description"
                     placeholder="Describe your issue"
                     rows={4}
                 />
                 <select
-                    className="w-full border border-gray-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-700 dark:bg-black dark:text-gray-100 dark:border-gray-700"
+                    className={inputClass}
                     name="priority"
                     defaultValue="Low"
                 >
@@ -58,11 +55,11 @@ export default function NewTicketForm({ user }: { user: string }) {
                     <option value="High">High Priority</option>
                 </select>
                 <select
-                    className="w-full border border-gray-200 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-gray-700 dark:bg-black dark:text-gray-100 dark:border-gray-700"
+                    className={inputClass}
                     name="department"
-                    defaultValue="Genaral"
+                    defaultValue="General"
                 >
-                    <option value="Genaral">Genaral</option>
+                    <option value="General">General</option>
                     <option value="HR">HR</option>
                     <option value="IT">IT</option>
                 </select>

@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { getTickets } from "@/actions/TicketActions";
 import { TicketType } from "@/models/TicketModel";
 import ManagerDashboardUI from "@/components/ManagerDashboardUI";
-import { getlAllTechnicians, getUsers } from "@/actions/UserActions";
+import { getAllTechnicians, getUsers } from "@/actions/UserActions";
 
 export default async function ManagerDashBoardPage() {
     const session = await auth.api.getSession({ headers: await headers() });
@@ -12,21 +12,22 @@ export default async function ManagerDashBoardPage() {
 
     const rawTickets = await getTickets(true);
     const rawUsers = await getUsers();
-    const rawTechnicians = await getlAllTechnicians();
+    const rawTechnicians = await getAllTechnicians();
 
     if (!rawTickets || !rawUsers || !rawTechnicians)
         return <div>Error loading data</div>;
 
-    const tickets = rawTickets.map((t: TicketType) => ({
-        ...t,
-        _id: t._id?.toString?.() ?? t._id ?? "",
-        createdAt: t.createdAt
-            ? typeof t.createdAt === "string"
-                ? t.createdAt
-                : new Date(t.createdAt).toISOString()
-            : "",
-    })) as unknown as TicketType[];
-
+    const tickets = Array.isArray(rawTickets)
+        ? rawTickets.map((t: TicketType) => ({
+              ...t,
+              _id: t._id?.toString?.() ?? t._id ?? "",
+              createdAt: t.createdAt
+                  ? typeof t.createdAt === "string"
+                      ? new Date(t.createdAt)
+                      : t.createdAt
+                  : new Date(),
+          }))
+        : [];
     const users = Array.isArray(rawUsers)
         ? rawUsers.map((u) => ({
               id: u._id?.toString?.() ?? u._id ?? "",
@@ -39,7 +40,6 @@ export default async function ManagerDashBoardPage() {
               image: u.image ?? null,
           }))
         : [];
-
     const technicians = Array.isArray(rawTechnicians)
         ? rawTechnicians.map((t) => ({
               id: t._id?.toString?.() ?? t._id ?? "",

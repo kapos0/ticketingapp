@@ -10,7 +10,7 @@ export default async function TicketsPage() {
     if (!session?.user) redirect("/auth/sign-in");
 
     const rawTickets = await getTickets(false);
-    const tickets = rawTickets as unknown as TicketType[];
+    const tickets = (rawTickets as TicketType[]);
 
     return (
         <div className="min-h-screen bg-blue-50 dark:bg-neutral-900 p-8 transition-colors duration-300">
@@ -23,7 +23,7 @@ export default async function TicketsPage() {
                 </p>
             ) : (
                 <div className="space-y-4 max-w-3xl mx-auto">
-                    {tickets.map((ticket: TicketType) => (
+                    {tickets.map((ticket) => (
                         <TicketItem key={ticket._id} ticket={ticket} />
                     ))}
                 </div>

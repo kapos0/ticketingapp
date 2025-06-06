@@ -22,12 +22,8 @@ export default async function TechnicianDashboardPage() {
                     : ticket.createdAt,
         };
     }
-
-    const assigned: TicketType[] = (assignedTickets as TicketType[]).map(
-        serializeTicket
-    );
+    const assigned: TicketType[] = (assignedTickets as TicketType[]).map(serializeTicket);
     const all: TicketType[] = (allTickets as TicketType[]).map(serializeTicket);
-
     return (
         <div className="min-h-screen bg-blue-50 dark:bg-neutral-900 p-8 transition-colors duration-300">
             <h1 className="text-3xl font-bold text-blue-600 dark:text-blue-300 mb-8 text-center transition-colors duration-300">

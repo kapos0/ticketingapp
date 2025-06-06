@@ -1,14 +1,10 @@
 "use client";
 import React, { useState } from "react";
-import { TicketType } from "@/models/TicketModel";
-import TicketItem from "@/components/TicketItem";
-import { UserType } from "@/models/UserModel";
-import { deleteUser, updateUserRole } from "@/actions/UserActions";
 import { toast } from "react-toastify";
-import {
-    deleteTicket,
-    assignTicketToTechnician,
-} from "@/actions/TicketActions";
+import { deleteUser, updateUserRole } from "@/actions/UserActions";
+import { deleteTicket, assignTicketToTechnician } from "@/actions/TicketActions";
+import type { TicketType } from "@/models/TicketModel";
+import type { UserType } from "@/models/UserModel";
 
 export default function ManagerDashboardUI({
     tickets,
@@ -24,6 +20,7 @@ export default function ManagerDashboardUI({
     const [showPopup, setShowPopup] = useState(false);
     // Ticket assign popup state
     const [assignTicket, setAssignTicket] = useState<TicketType | null>(null);
+     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [selectedTechnician, setSelectedTechnician] =
         useState<UserType | null>(null);
     const [assignUserId, setAssignUserId] = useState<string>("");
@@ -113,6 +110,92 @@ export default function ManagerDashboardUI({
         setAssignUserId("");
     }
 
+    // Kullanıcılar tablosu render fonksiyonu
+    function renderUsersTable() {
+        return (
+            <table className="w-full text-left text-sm sm:text-base min-w-[400px]">
+                <thead>
+                    <tr>
+                        <th>Ad</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Aksiyon</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {users.map((user) => (
+                        <tr key={user.id}>
+                            <td>{user.name}</td>
+                            <td>{user.email}</td>
+                            <td>{user.role}</td>
+                            <td>
+                                <button
+                                    onClick={() => handleUserClick(user)}
+                                    className="text-blue-600 hover:underline mr-2"
+                                >
+                                    Rol Değiştir
+                                </button>
+                                <button
+                                    onClick={() => handleDeleteUser(user.id)}
+                                    className="text-red-600 hover:underline"
+                                >
+                                    Sil
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        );
+    }
+    // Ticketlar tablosu render fonksiyonu
+    function renderTicketsTable() {
+        return (
+            <div className="space-y-4 max-w-3xl mx-auto">
+                {tickets.map((ticket) => (
+                    <div
+                        key={ticket._id}
+                        className="flex justify-between items-center bg-white dark:bg-neutral-900 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6"
+                    >
+                        <div>
+                            <h1 className="text-sm text-gray-500 dark:text-gray-200">
+                                Created by: {ticket.user}
+                            </h1>
+                            <h3 className="text-sm mt-2 text-gray-500 dark:text-gray-200">
+                                Assigned To:{" "}
+                                {ticket.assignInfo?.assignedTechnicianName ||
+                                    "no one"}
+                            </h3>
+                            <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-300">
+                                {ticket.subject}
+                            </h2>
+                        </div>
+                        <div className="text-right space-y-2">
+                            <div className="text-sm text-gray-500 dark:text-gray-200">
+                                Priority: <span>{ticket.priority}</span>
+                            </div>
+                            <div className="text-sm text-gray-500 dark:text-gray-200">
+                                Department: <span>{ticket.department}</span>
+                            </div>
+                            <button
+                                onClick={() => handleAssignClick(ticket)}
+                                className="inline-block mt-2 text-sm px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+                            >
+                                Ata
+                            </button>
+                            <button
+                                onClick={() => handleDeleteTicket(ticket._id!)}
+                                className="inline-block mt-2 text-sm px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700 ml-2"
+                            >
+                                Sil
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-blue-50 dark:bg-neutral-900 p-4 sm:p-8 transition-colors duration-300 flex flex-col lg:flex-row gap-4 lg:gap-8">
             {/* Left: Users Table */}
@@ -120,251 +203,96 @@ export default function ManagerDashboardUI({
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-blue-700 dark:text-blue-200">
                     Kullanıcılar
                 </h2>
-                <table className="w-full text-left text-sm sm:text-base min-w-[400px]">
-                    <thead>
-                        <tr className="border-b border-blue-100 dark:border-neutral-700">
-                            <th className="py-2">Ad</th>
-                            <th className="py-2">Email</th>
-                            <th className="py-2">Rol</th>
-                            <th className="py-2 text-center">Sil</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {users.map((user: UserType) => {
-                            return (
-                                <tr
-                                    key={user.id}
-                                    className="hover:bg-blue-100 dark:hover:bg-neutral-700 cursor-pointer group"
-                                    onClick={() => handleUserClick(user)}
-                                >
-                                    <td className="py-2 break-words max-w-[120px]">
-                                        {user.name}
-                                    </td>
-                                    <td className="py-2 break-all max-w-[140px]">
-                                        {user.email}
-                                    </td>
-                                    <td className="py-2 capitalize">
-                                        {user.role}
-                                    </td>
-                                    <td className="py-2 text-center">
-                                        <button
-                                            className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded shadow transition text-xs sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDeleteUser(user.id);
-                                            }}
-                                            title="Kullanıcıyı Sil"
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-4 w-4"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M6 18L18 6M6 6l12 12"
-                                                />
-                                            </svg>
-                                            Sil
-                                        </button>
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
+                {renderUsersTable()}
             </div>
-
             {/* Right: Tickets */}
             <div className="flex-1 w-full max-w-full">
                 <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-300 mb-6 sm:mb-8 text-center transition-colors duration-300">
                     Support Tickets
                 </h1>
                 {tickets.length === 0 ? (
-                    <p className="text-center text-gray-600 dark:text-gray-200 transition-colors duration-300">
+                    <p className="text-center text-gray-600 dark:text-gray-200">
                         No Tickets Yet
                     </p>
                 ) : (
-                    <div className="space-y-3 sm:space-y-4 max-w-full sm:max-w-3xl mx-auto">
-                        {tickets.map((ticket: TicketType) => {
-                            return (
-                                <div
-                                    key={ticket._id}
-                                    className="relative bg-white dark:bg-neutral-800 rounded-lg shadow p-4 flex items-center justify-between gap-4 group"
-                                >
-                                    <div className="flex-1">
-                                        <TicketItem ticket={ticket} />
-                                        {/* Atanan admin gösterimi */}
-                                        <div className="mt-2 text-sm text-gray-500 dark:text-gray-300">
-                                            Atanan:{" "}
-                                            {ticket.assignInfo?.assignedTo
-                                                ? `${ticket.assignInfo.assignedTechnicianName}`
-                                                : "Atanmamış"}
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-col gap-2 items-end">
-                                        <button
-                                            className="ml-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200"
-                                            onClick={() =>
-                                                handleAssignClick(ticket)
-                                            }
-                                        >
-                                            Ata
-                                        </button>
-                                        <button
-                                            className="inline-flex items-center gap-1 px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded shadow transition text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
-                                            onClick={() =>
-                                                handleDeleteTicket(ticket._id!)
-                                            }
-                                            title="Ticketı Sil"
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-4 w-4"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M6 18L18 6M6 6l12 12"
-                                                />
-                                            </svg>
-                                            Sil
-                                        </button>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
+                    renderTicketsTable()
                 )}
             </div>
-
             {/* Popup for user role change */}
             {showPopup && selectedUser && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-2">
-                    <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-4 sm:p-8 min-w-[90vw] max-w-[95vw] sm:min-w-[320px] sm:max-w-[400px] w-full relative">
-                        <button
-                            className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xl"
-                            onClick={handleClose}
-                        >
-                            ×
-                        </button>
-                        <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 text-blue-700 dark:text-blue-200">
-                            Yetki Değiştir
-                        </h3>
-                        <div className="mb-3 sm:mb-4">
-                            <div className="font-semibold">
-                                {selectedUser.name}
-                            </div>
-                            <div className="text-xs sm:text-sm text-gray-500">
-                                {selectedUser.email}
-                            </div>
-                        </div>
-                        <label className="block mb-2 text-xs sm:text-sm font-medium">
-                            Rol Seç
-                        </label>
+                    <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-sm">
+                        <h2 className="text-lg font-bold mb-4">Rol Değiştir</h2>
                         <select
-                            className="w-full p-2 rounded border border-blue-200 dark:border-neutral-700 bg-blue-50 dark:bg-neutral-900"
                             value={newRole}
                             onChange={handleRoleChange}
+                            className="w-full p-2 mb-4 border rounded"
                         >
-                            {["user", "technician", "manager"].map((role) => (
-                                <option key={role} value={role} className="capitalize">
-                                    {role}
-                                </option>
-                            ))}
+                            <option value="user">User</option>
+                            <option value="technician">Technician</option>
+                            <option value="manager">Manager</option>
                         </select>
-                        <button
-                            className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200"
-                            onClick={handleClose}
-                        >
-                            Kaydet
-                        </button>
+                        <div className="flex justify-end gap-2">
+                            <button
+                                onClick={handleClose}
+                                className="px-4 py-2 rounded bg-gray-300"
+                            >
+                                Kapat
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
-
             {/* Ticket Assign Popup */}
             {showAssignPopup && assignTicket && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-2">
-                    <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-4 sm:p-8 min-w-[90vw] max-w-[95vw] sm:min-w-[320px] sm:max-w-[400px] w-full relative">
-                        <button
-                            className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xl"
-                            onClick={handleAssignClose}
-                        >
-                            ×
-                        </button>
-                        <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 text-blue-700 dark:text-blue-200">
-                            Ticket Ata
-                        </h3>
-                        <div className="mb-3 sm:mb-4">
-                            <div className="font-semibold">
-                                {assignTicket.subject}
-                            </div>
-                        </div>
-                        <label className="block mb-2 text-xs sm:text-sm font-medium">
-                            Kullanıcı Seç
-                        </label>
+                    <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-sm">
+                        <h2 className="text-lg font-bold mb-4">Teknisyen Ata</h2>
                         <select
-                            className="w-full p-2 rounded border border-blue-200 dark:border-neutral-700 bg-blue-50 dark:bg-neutral-900"
                             value={assignUserId}
-                            onChange={(e) => {
-                                handleAssignUserChange(e);
-                                const selected = technicians.find(
-                                    (user) => user.id === e.target.value
-                                );
-                                setSelectedTechnician(selected || null);
-                            }}
+                            onChange={handleAssignUserChange}
+                            className="w-full p-2 mb-4 border rounded"
                         >
-                            <option value="">Kullanıcı seçin</option>
-                            {technicians.map((user) => (
-                                <option
-                                    key={user.id}
-                                    value={user.id}
-                                    className="capitalize"
-                                >
-                                    {user.name} ({user.role})
+                            <option value="">Teknisyen Seç</option>
+                            {technicians.map((tech) => (
+                                <option key={tech.id} value={tech.id}>
+                                    {tech.name}
                                 </option>
                             ))}
                         </select>
-                        <button
-                            className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200 disabled:opacity-50"
-                            onClick={handleAssignSave}
-                            disabled={!assignUserId}
-                        >
-                            Kaydet
-                        </button>
+                        <div className="flex justify-end gap-2">
+                            <button
+                                onClick={handleAssignSave}
+                                className="px-4 py-2 rounded bg-blue-600 text-white"
+                            >
+                                Kaydet
+                            </button>
+                            <button
+                                onClick={handleAssignClose}
+                                className="px-4 py-2 rounded bg-gray-300"
+                            >
+                                Kapat
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
-
             {/* Kullanıcı silme onay popup */}
             {deleteUserId && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-2">
-                    <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-4 sm:p-8 min-w-[90vw] max-w-[95vw] sm:min-w-[320px] sm:max-w-[400px] w-full relative flex flex-col items-center">
-                        <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 text-red-700 dark:text-red-300">
-                            Kullanıcıyı Sil
-                        </h3>
-                        <p className="mb-6 text-gray-700 dark:text-gray-200 text-xs sm:text-base">
-                            Bu kullanıcıyı silmek istediğinize emin misiniz?
-                        </p>
-                        <div className="flex gap-2 sm:gap-4 w-full justify-center">
+                    <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-sm">
+                        <h2 className="text-lg font-bold mb-4">Kullanıcıyı Sil</h2>
+                        <p>Bu kullanıcıyı silmek istediğinize emin misiniz?</p>
+                        <div className="flex justify-end gap-2 mt-4">
                             <button
-                                className="px-3 sm:px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-bold text-xs sm:text-base"
                                 onClick={confirmDeleteUser}
+                                className="px-4 py-2 rounded bg-red-600 text-white"
                             >
-                                Evet, Sil
+                                Sil
                             </button>
                             <button
-                                className="px-3 sm:px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded font-bold text-xs sm:text-base"
                                 onClick={cancelDeleteUser}
+                                className="px-4 py-2 rounded bg-gray-300"
                             >
                                 Vazgeç
                             </button>
@@ -375,23 +303,19 @@ export default function ManagerDashboardUI({
             {/* Ticket silme onay popup */}
             {deleteTicketId && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-2">
-                    <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-4 sm:p-8 min-w-[90vw] max-w-[95vw] sm:min-w-[320px] sm:max-w-[400px] w-full relative flex flex-col items-center">
-                        <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 text-red-700 dark:text-red-300">
-                            Ticketı Sil
-                        </h3>
-                        <p className="mb-6 text-gray-700 dark:text-gray-200 text-xs sm:text-base">
-                            Bu ticketı silmek istediğinize emin misiniz?
-                        </p>
-                        <div className="flex gap-2 sm:gap-4 w-full justify-center">
+                    <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-sm">
+                        <h2 className="text-lg font-bold mb-4">Ticket Sil</h2>
+                        <p>Bu ticketı silmek istediğinize emin misiniz?</p>
+                        <div className="flex justify-end gap-2 mt-4">
                             <button
-                                className="px-3 sm:px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-bold text-xs sm:text-base"
                                 onClick={confirmDeleteTicket}
+                                className="px-4 py-2 rounded bg-red-600 text-white"
                             >
-                                Evet, Sil
+                                Sil
                             </button>
                             <button
-                                className="px-3 sm:px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded font-bold text-xs sm:text-base"
                                 onClick={cancelDeleteTicket}
+                                className="px-4 py-2 rounded bg-gray-300"
                             >
                                 Vazgeç
                             </button>

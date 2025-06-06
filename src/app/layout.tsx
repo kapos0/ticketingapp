@@ -21,7 +21,7 @@ export default function RootLayout({
                     content="A Better Auth Starter Kit for Next.js"
                 />
                 <link rel="icon" href="/favicon.ico" />
-                <title>Better Auth Demo</title>
+                {/* <title>Better Auth Demo</title> Başlık yönetimi Next.js metadata ile yapılmalı */}
             </head>
             <body>
                 <ThemeProvider

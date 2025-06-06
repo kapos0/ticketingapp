@@ -4,10 +4,12 @@ import { getCollection } from "./TicketActions";
 import { revalidatePath } from "next/cache";
 import { ObjectId } from "mongodb";
 
+// Kullanıcı koleksiyon adı sabitleniyor
+const USER_COLLECTION = "user";
 
 export async function getUsers() {
     try {
-        const users = await (await getCollection("users")).find({}).toArray();
+        const users = await (await getCollection(USER_COLLECTION)).find({}).toArray();
         return users;
     } catch (error) {
         console.error("Error fetching users:", error);
@@ -15,9 +17,9 @@ export async function getUsers() {
     }
 }
 
-export async function getlAllTechnicians() {
+export async function getAllTechnicians() {
     try {
-        const technicians = await (await getCollection("users"))
+        const technicians = await (await getCollection(USER_COLLECTION))
             .find({ role: "technician" })
             .toArray();
         return technicians;
@@ -31,7 +33,7 @@ export async function deleteUser(userId: string) {
     try {
         if (!userId) return { success: false, message: "User ID is required." };
 
-        const userCollection = await getCollection("users");
+        const userCollection = await getCollection(USER_COLLECTION);
         const ticketCollection = await getCollection("tickets");
 
         await userCollection.deleteOne({ _id: new ObjectId(userId) });
@@ -51,33 +53,28 @@ export async function deleteUser(userId: string) {
 
 export async function updateUserRole(userId: string, newRole: string) {
     try {
-        if (!userId || !newRole)
+        if (!userId || !newRole) {
             return {
                 success: false,
                 message: "User ID and new role are required.",
             };
-
-        const userCollection = await getCollection("users");
+        }
+        const userCollection = await getCollection(USER_COLLECTION);
         const result = await userCollection.updateOne(
             { _id: new ObjectId(userId) },
             { $set: { role: newRole } }
         );
         if (result.modifiedCount > 0) {
-            console.log(`User with ID ${userId} updated to role ${newRole}.`);
             revalidatePath("/");
             return {
                 success: true,
                 message: `User with ID ${userId} updated to role ${newRole}.`,
             };
-        } else {
-            console.error(
-                `No user found with ID ${userId} or role is unchanged.`
-            );
-            return {
-                success: false,
-                message: `No user found with ID ${userId} or role is unchanged.`,
-            };
         }
+        return {
+            success: false,
+            message: `No user found with ID ${userId} or role is unchanged.`,
+        };
     } catch (error) {
         console.error("Error updating user role:", error);
         return { success: false, message: "Error updating user role." };
