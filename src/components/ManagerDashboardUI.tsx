@@ -221,12 +221,12 @@ export default function ManagerDashboardUI({
             {/* Popup for user role change */}
             {showPopup && selectedUser && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-2">
-                    <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-sm">
-                        <h2 className="text-lg font-bold mb-4">Rol Değiştir</h2>
+                    <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-sm border border-gray-200 dark:border-neutral-700">
+                        <h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">Rol Değiştir</h2>
                         <select
                             value={newRole}
                             onChange={handleRoleChange}
-                            className="w-full p-2 mb-4 border rounded"
+                            className="w-full p-2 mb-4 border border-gray-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-gray-900 dark:text-gray-100"
                         >
                             <option value="user">User</option>
                             <option value="technician">Technician</option>
@@ -235,7 +235,7 @@ export default function ManagerDashboardUI({
                         <div className="flex justify-end gap-2">
                             <button
                                 onClick={handleClose}
-                                className="px-4 py-2 rounded bg-gray-300"
+                                className="px-4 py-2 rounded bg-gray-300 dark:bg-neutral-700 text-gray-900 dark:text-gray-100"
                             >
                                 Kapat
                             </button>
@@ -246,12 +246,12 @@ export default function ManagerDashboardUI({
             {/* Ticket Assign Popup */}
             {showAssignPopup && assignTicket && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-2">
-                    <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-sm">
-                        <h2 className="text-lg font-bold mb-4">Teknisyen Ata</h2>
+                    <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-sm border border-gray-200 dark:border-neutral-700">
+                        <h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">Teknisyen Ata</h2>
                         <select
                             value={assignUserId}
                             onChange={handleAssignUserChange}
-                            className="w-full p-2 mb-4 border rounded"
+                            className="w-full p-2 mb-4 border border-gray-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-gray-900 dark:text-gray-100"
                         >
                             <option value="">Teknisyen Seç</option>
                             {technicians.map((tech) => (
@@ -263,13 +263,13 @@ export default function ManagerDashboardUI({
                         <div className="flex justify-end gap-2">
                             <button
                                 onClick={handleAssignSave}
-                                className="px-4 py-2 rounded bg-blue-600 text-white"
+                                className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
                             >
                                 Kaydet
                             </button>
                             <button
                                 onClick={handleAssignClose}
-                                className="px-4 py-2 rounded bg-gray-300"
+                                className="px-4 py-2 rounded bg-gray-300 dark:bg-neutral-700 text-gray-900 dark:text-gray-100"
                             >
                                 Kapat
                             </button>
@@ -280,9 +280,9 @@ export default function ManagerDashboardUI({
             {/* Kullanıcı silme onay popup */}
             {deleteUserId && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-2">
-                    <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-sm">
-                        <h2 className="text-lg font-bold mb-4">Kullanıcıyı Sil</h2>
-                        <p>Bu kullanıcıyı silmek istediğinize emin misiniz?</p>
+                    <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-sm border border-gray-200 dark:border-neutral-700">
+                        <h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">Kullanıcıyı Sil</h2>
+                        <p className="text-gray-800 dark:text-gray-200">Bu kullanıcıyı silmek istediğinize emin misiniz?</p>
                         <div className="flex justify-end gap-2 mt-4">
                             <button
                                 onClick={confirmDeleteUser}
@@ -292,7 +292,7 @@ export default function ManagerDashboardUI({
                             </button>
                             <button
                                 onClick={cancelDeleteUser}
-                                className="px-4 py-2 rounded bg-gray-300"
+                                className="px-4 py-2 rounded bg-gray-300 dark:bg-neutral-700 text-gray-900 dark:text-gray-100"
                             >
                                 Vazgeç
                             </button>
@@ -303,9 +303,9 @@ export default function ManagerDashboardUI({
             {/* Ticket silme onay popup */}
             {deleteTicketId && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-2">
-                    <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-sm">
-                        <h2 className="text-lg font-bold mb-4">Ticket Sil</h2>
-                        <p>Bu ticketı silmek istediğinize emin misiniz?</p>
+                    <div className="bg-white dark:bg-neutral-800 rounded-lg p-6 w-full max-w-sm border border-gray-200 dark:border-neutral-700">
+                        <h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">Ticket Sil</h2>
+                        <p className="text-gray-800 dark:text-gray-200">Bu ticketı silmek istediğinize emin misiniz?</p>
                         <div className="flex justify-end gap-2 mt-4">
                             <button
                                 onClick={confirmDeleteTicket}
@@ -315,7 +315,7 @@ export default function ManagerDashboardUI({
                             </button>
                             <button
                                 onClick={cancelDeleteTicket}
-                                className="px-4 py-2 rounded bg-gray-300"
+                                className="px-4 py-2 rounded bg-gray-300 dark:bg-neutral-700 text-gray-900 dark:text-gray-100"
                             >
                                 Vazgeç
                             </button>
