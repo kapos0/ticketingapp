@@ -75,7 +75,7 @@ export default function SignInPage() {
                                 A
                             </div>
                             <h1 className="text-2xl font-bold">
-                                Better-Auth Demo
+                                Ticket Management App
                             </h1>
                         </div>
                     </Link>
