@@ -21,5 +21,5 @@ SMTP_PASS=
 SENTRY_AUTH_TOKEN=
 ```
 
-first run
+for local dev first run and open the localhost 1080 port on the browser
 `pnpm dlx maildev --web 1080 --smtp 1025`

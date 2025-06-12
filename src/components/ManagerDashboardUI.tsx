@@ -20,7 +20,6 @@ export default function ManagerDashboardUI({
     const [showPopup, setShowPopup] = useState(false);
     // Ticket assign popup state
     const [assignTicket, setAssignTicket] = useState<TicketType | null>(null);
-     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [selectedTechnician, setSelectedTechnician] =
         useState<UserType | null>(null);
     const [assignUserId, setAssignUserId] = useState<string>("");
@@ -86,6 +85,8 @@ export default function ManagerDashboardUI({
         e: React.ChangeEvent<HTMLSelectElement>
     ) {
         setAssignUserId(e.target.value);
+        const tech = technicians.find((t) => t.id === e.target.value);
+        setSelectedTechnician(tech || null);
     }
     async function handleAssignSave() {
         if (!assignTicket || !assignUserId) return;

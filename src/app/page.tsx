@@ -12,6 +12,18 @@ export default function Home() {
                 Fast and simple support ticket management system.
             </p>
 
+            <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-gray-800">
+                For manager account the default credentials are:
+            </h2>
+
+            <p className="mb-2">
+                eden.turhann@gmail.com
+            </p>
+
+            <p className="mb-2">
+                123456789
+            </p>
+
             <div className="flex flex-col md:flex-row gap-4 justify-center">
                 <Link
                     href="/tickets/new"
